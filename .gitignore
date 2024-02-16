@@ -1,0 +1,7 @@
+# Ignore compiled binaries
+*.exe
+*.dll
+*.env
+*.txt
+# Ignore dependency directories
+node_modules/
