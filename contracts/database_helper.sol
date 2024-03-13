@@ -6,7 +6,8 @@ contract UserDB {
         string username;//use username as index while creating event
         string password;
         address wallet;
-        bool ismentor;
+        string cid;//ipfs cid will be stored here 
+        bool[6] challenges;//set true for those challenges are active
     }
     mapping(string => user) public wallets;
 }

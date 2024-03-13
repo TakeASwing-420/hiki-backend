@@ -2,10 +2,11 @@
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./database_helper.sol";
 
-contract Hikiko is ERC20Capped, Ownable, UserDB{ 
+contract Hikiko is ERC20Capped, Ownable, UserDB, ERC20Burnable{ 
     address public Manager;
     
     uint256 public limit = 2000000000 ;
@@ -16,20 +17,27 @@ contract Hikiko is ERC20Capped, Ownable, UserDB{
         _mint(Manager, initial_coinbase);
     }
 
+      function _mint(address account, uint256 amount) internal override(ERC20, ERC20Capped) {
+        ERC20Capped._mint(account, amount);
+    }
+
     // Allow users to transfer tokens to the Manager when redeeming rewards
-    function redeemTokens(uint256 amount,address x) public onlyOwner {
+    function redeemTokens(uint256 amount, string calldata name) public onlyOwner {
+        address x= wallets[name].wallet;
         _transfer(x, Manager, amount);
     }
 
     // Allow the user to fetch tokens from the contract
-    function fetchTokens(uint256 amount,address x) public onlyOwner{
+    function fetchTokens(uint256 amount,string calldata name) public onlyOwner{
+        address x= wallets[name].wallet;
         transfer(x, amount);
     }
 
-    function delete_user(string memory name) public onlyOwner{
+    function delete_user(string calldata name) public onlyOwner{
         address x= wallets[name].wallet;
         uint256 amount = balanceOf(x);
         _transfer(x, Manager, amount); // Transfer all the amount of tokens before deletion
+        burn(amount);//burn the extra tokens
         delete wallets[name];
     }
 
@@ -51,7 +59,7 @@ contract Hikiko is ERC20Capped, Ownable, UserDB{
     }
 
     //Update the wallet address
-    function Update_address(string memory name, address data) public onlyOwner{
+    function Update_address(string calldata name, address data) public onlyOwner{
         address x= wallets[name].wallet;
         uint256 amount = balanceOf(x);
         _transfer(x, data, amount);//Before doing so send the existing tokens to new account
@@ -62,14 +70,21 @@ contract Hikiko is ERC20Capped, Ownable, UserDB{
         wallets[name].username = name;
         wallets[name].wallet = wallet;
         wallets[name].password = password;
+        wallets[name].cid = "";
     }
 
-    function Update_password(string memory name, string memory data) public onlyOwner {
+    function Update_password(string calldata name, string memory data) public onlyOwner {
         wallets[name].password = data;
     }
 
-    function Update_mentorship(string memory name) public onlyOwner {
-        wallets[name].ismentor = true;
+    function Update_profile(string calldata name, string memory data) public onlyOwner {
+        wallets[name].cid = data;
     }
+    
+    function setChallenges(string calldata name, uint256 challengeIndex, bool isActive) public onlyOwner {
+    require(challengeIndex < 6, "Invalid challenge index"); // Ensure challenge index is within bounds
+    wallets[name].challenges[challengeIndex] = isActive;
+}
+
 
 }
