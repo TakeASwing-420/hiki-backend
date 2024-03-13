@@ -11,8 +11,6 @@ const router = express.Router();
 - It should be able to tell the user the working and motto of this app
 - When asking questions like "I am in a bad mood" it should respond to decline answering them and suggest the user to get in touch with a medical professional*/
 
-/*TODO 6. migrate to polygon framework in node.js*/
-
 router.post("/update-password", async (req, res) => {
   const { username, new_password } = req.body;
 
@@ -85,26 +83,6 @@ router.delete("/delete-user", async (req, res) => {
   }
 });
 
-router.post("/update-mentorship", async (req, res) => {
-  const { username } = req.body;
-
-  try {
-    await usercontract.Update_mentorship(username);
-    res.status(200).json({ message: "Mentorship status updated successfully!" });
-    const blockNumber = await provider.getBlockNumber();
-    console.log('Current block number:', blockNumber);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error Encountered" });
-  }
-});
-
-// !3. create a purchase(input should not be a single item but a list of goods) api using mongoDB, mySQL or cloud in node.js and the api should also return the deducted balance from user but....
-
-// !4. while updating the user balance using redeem tokens or fetch tokens api move the incoming requests into a queue.
-// !   Process this queue once in a 48 hours...as if you process ech query instantly you will be paying much gas fees.
-// !  But here is the catch! you must be able to return the deducted balance or increased balance as if it was actually
-// !  processed.Use database for storing balance
 
 router.post("/balance", async (req, res) => {
   const { username } = req.body;

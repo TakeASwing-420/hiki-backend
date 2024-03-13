@@ -11,5 +11,3 @@ export function verifyProof(password, actual_commitment, randomValue) {
 	return computedCommitment === actual_commitment;
   }
 
-
-  

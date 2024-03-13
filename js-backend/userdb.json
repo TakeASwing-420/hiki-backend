@@ -233,6 +233,29 @@
 	{
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "challengeIndex",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isActive",
+				"type": "bool"
+			}
+		],
+		"name": "setChallenges",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "to",
 				"type": "address"
@@ -335,19 +358,6 @@
 			}
 		],
 		"name": "Update_address",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			}
-		],
-		"name": "Update_mentorship",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -572,11 +582,6 @@
 				"internalType": "address",
 				"name": "wallet",
 				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "ismentor",
-				"type": "bool"
 			},
 			{
 				"internalType": "string",

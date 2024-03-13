@@ -50,9 +50,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export const client = ipfsHttpClient("http://192.168.0.152:5002");
-export const contractaddress = "0x8ad36Bd2E911959550Bf57507F4A99e95A5C7d31";
+export const contractaddress = "0x6833b0fa623bac5cff3ac13bdcb66767452caa86";
 
-export const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/q1jVC3tLd3_PoadQyMR08osZJ8SDKEqq");
+export const provider = new ethers.JsonRpcProvider("https://nd-497-262-836.p2pify.com/378f9ce63323c084fccaf08dcf9a0e1f");
 
 const manager_wallet_private_key = privateKey;
 const manager = new ethers.Wallet(manager_wallet_private_key, provider);
@@ -91,11 +91,9 @@ app.post("/register", async (req, res) => {
     try {
       const { commitment, private_key } = generateProof(password);
       await usercontract.saveUser(wallet, username, commitment);
-      const blockNumber = await provider.getBlockNumber();
       addAddressToRegistry(wallet);
       const user = await usercontract.wallets(username);
       res.status(200).json({ message: "User registered successfully!", private_key: private_key, _user: user });
-      console.log('Current block number:', blockNumber);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error Encountered"});
@@ -126,13 +124,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// !3. create a purchase(input should not be a single item but a list of goods) api using mongoDB, mySQL or cloud in node.js and the api should also return the deducted balance from user but....
-
-// !4. while updating the user balance using redeem tokens or fetch tokens api move the incoming requests into a queue.
-// !   Process this queue once in a 48 hours...as if you process ech query instantly you will be paying much gas fees.
-// !  But here is the catch! you must be able to return the deducted balance or increased balance as if it was actually
-// !  processed.Use database for storing balance
-
 app.post("/redeem-tokens",async (req, res) => {
   const {amount, name} = req.body;
   try {
@@ -156,7 +147,26 @@ app.post("/fetch-tokens",async (req, res) => {
   }
 });
 
+app.post("/set-challenges", async (req, res) => {
+  const { username, challengeIndex, isActive } = req.body;
+
+  try {
+      // Call the setChallenges function in the smart contract
+      const tx = await usercontract.setChallenges(username, challengeIndex, isActive);
+
+      // Wait for the transaction to be mined
+      await tx.wait();
+
+      res.status(200).json({ message: "Challenges set successfully" });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error setting challenges" });
+  }
+});
+
 const port = 3000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on ${port}`);
 });
+
+
