@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 export function generateProof(password) {
-	const private_key = crypto.randomBytes(32).toString('hex');
+	const private_key = crypto.randomBytes(4).toString('hex');
 	const commitment = crypto.createHash('sha256').update(password + private_key).digest('hex');
 	return {commitment, private_key};
   }

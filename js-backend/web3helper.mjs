@@ -55,7 +55,7 @@ app.post("/upload", upload.single('image'), async (req, res) => {
     res.status(500).json({ error: error.message });
      }
 });
-// TODO 5. return access token to keep user logged in using json web token in node.js (validity 24 hours)
+// TODO 1. return access token to keep user logged in using json web token in node.js (validity 24 hours)
 app.post("/register", async (req, res) => {
   const { wallet, username, confirm_password, password } = req.body;
   const user = await usercontract.wallets(username);
@@ -69,14 +69,14 @@ app.post("/register", async (req, res) => {
       await usercontract.saveUser(wallet, username, commitment);
 
       const user = await usercontract.wallets(username);
-      res.status(200).json({loggedIn: true, message: "User registered successfully!", private_key: private_key});
+      res.status(200).json({loggedIn: true, private_key: private_key});
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error Encountered"});
     }
   }
 });
-// TODO 5. return access token to keep user logged in using json web token in node.js (validity 24 hours0
+// TODO 1. return access token to keep user logged in using json web token in node.js (validity 24 hours0
 app.post("/login", async (req, res) => {
   const { username, password, private_key } = req.body;
 
@@ -93,6 +93,17 @@ app.post("/login", async (req, res) => {
     } else {
       res.status(401).json({ loggedIn: false, message: "User not found" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/user-info", async (req, res) => {
+  const {username} = req.body;
+  try {
+    const _user = await usercontract.wallets(username);
+    res.status(200).json({user : _user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

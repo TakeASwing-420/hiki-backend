@@ -4,13 +4,6 @@ import { generateProof, verifyProof } from './verifier.mjs';
 import fs from 'fs';
 const router = express.Router();
 
-
-/*TODO 1. build a FAQ chatbot using google makersuite:
-- It should be able to navigate the user to requested page
-- It should be able to avoid to answer unnecessary or controversial questions
-- It should be able to tell the user the working and motto of this app
-- When asking questions like "I am in a bad mood" it should respond to decline answering them and suggest the user to get in touch with a medical professional*/
-
 router.post("/update-password", async (req, res) => {
   const { username, new_password } = req.body;
 
