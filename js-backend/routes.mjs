@@ -36,21 +36,7 @@ router.post("/update-wallet", async (req, res) => {
   }
 });
 
-const addressesFilePath = 'registered_addresses.json';
-function getRegisteredAddresses() {
-  try {
-    const data = fs.readFileSync(addressesFilePath);
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
 
-function removeAddressFromRegistry(address) {
-  let registeredAddresses = getRegisteredAddresses();
-  registeredAddresses = registeredAddresses.filter(addr => addr !== address);
-  fs.writeFileSync(addressesFilePath, JSON.stringify(registeredAddresses));
-}
 
 router.delete("/delete-user", async (req, res) => {
   const { username, cid } = req.body;
@@ -60,7 +46,7 @@ router.delete("/delete-user", async (req, res) => {
 
     if (user.wallet !== "0x0000000000000000000000000000000000000000") {
       await usercontract.delete_user(username);
-      removeAddressFromRegistry(user.wallet); // Remove the wallet address from the file
+      
       res.status(200).json({ message: "User deleted successfully!" });
 
       try {
@@ -69,9 +55,7 @@ router.delete("/delete-user", async (req, res) => {
       } catch (error) {
         console.error(`Error while unpinning content with CID ${cid}:`, error);
       }
-      
-      const blockNumber = await provider.getBlockNumber();
-      console.log('Current block number:', blockNumber);
+
 
     } else {
       res.status(401).json({ message: "User not found" });

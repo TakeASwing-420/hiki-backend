@@ -14,28 +14,6 @@ const app = express();
 app.use(express.json(),routes);
 
 
-//TODO 2. create a separate database to store registered addresses using mongoDb, mySQL or cloud in node.js or python to check valid address or not while registering a new user
-const addressesFilePath = 'registered_addresses.json';
-
-function getRegisteredAddresses() {
-  try {
-    const data = fs.readFileSync(addressesFilePath);
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-function addAddressToRegistry(address) {
-  const registeredAddresses = getRegisteredAddresses();
-  registeredAddresses.push(address);
-  fs.writeFileSync(addressesFilePath, JSON.stringify(registeredAddresses));
-}
-
-function isAddressRegistered(address) {
-  const registeredAddresses = getRegisteredAddresses();
-  return registeredAddresses.includes(address);
-}
 //------------------------------------------------------------------------------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -48,9 +26,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
 export const client = ipfsHttpClient("http://192.168.0.152:5002");
-export const contractaddress = "0x6833b0fa623bac5cff3ac13bdcb66767452caa86";
+export const contractaddress = "0x0A2A867D8a6a2D2f41d96546B163E5329F8D4637";
 
 export const provider = new ethers.JsonRpcProvider("https://nd-497-262-836.p2pify.com/378f9ce63323c084fccaf08dcf9a0e1f");
 
@@ -80,20 +57,19 @@ app.post("/upload", upload.single('image'), async (req, res) => {
 });
 // TODO 5. return access token to keep user logged in using json web token in node.js (validity 24 hours)
 app.post("/register", async (req, res) => {
-  const { wallet, username, password } = req.body;
+  const { wallet, username, confirm_password, password } = req.body;
   const user = await usercontract.wallets(username);
-  
-  if (user.username === username){
+  if (!(password === confirm_password))
+        res.status(401).json({error : "passwords not matched"});
+  else if (user.username === username){
     res.status(401).json({ error: "Username already exists"});
-  } else if (isAddressRegistered(wallet)) {
-    res.status(401).json({ error: "Address already registered"});
-  } else {
+  }  else {
     try {
       const { commitment, private_key } = generateProof(password);
       await usercontract.saveUser(wallet, username, commitment);
-      addAddressToRegistry(wallet);
+
       const user = await usercontract.wallets(username);
-      res.status(200).json({ message: "User registered successfully!", private_key: private_key, _user: user });
+      res.status(200).json({loggedIn: true, message: "User registered successfully!", private_key: private_key});
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error Encountered"});
@@ -109,12 +85,11 @@ app.post("/login", async (req, res) => {
 
     if (user.wallet !== "0x0000000000000000000000000000000000000000") {
       const hashedPassword = user.password;
-
-      if (verifyProof(password, hashedPassword, private_key)) {
-        res.status(200).json({ loggedIn: true,_user: user});
-      } else {
+       if (verifyProof(password, hashedPassword, private_key)) 
+        res.status(200).json({ loggedIn: true});
+       else 
         res.status(401).json({ loggedIn: false, message: "Invalid credentials" });
-      }
+      
     } else {
       res.status(401).json({ loggedIn: false, message: "User not found" });
     }
@@ -151,10 +126,7 @@ app.post("/set-challenges", async (req, res) => {
   const { username, challengeIndex, isActive } = req.body;
 
   try {
-      // Call the setChallenges function in the smart contract
       const tx = await usercontract.setChallenges(username, challengeIndex, isActive);
-
-      // Wait for the transaction to be mined
       await tx.wait();
 
       res.status(200).json({ message: "Challenges set successfully" });
