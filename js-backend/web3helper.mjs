@@ -60,6 +60,8 @@ app.post("/register", async (req, res) => {
   const user = await usercontract.wallets(username);
   if (!(password === confirm_password))
     res.status(401).json({error : "Passwords do not match"});
+  else if(!(password.length >= 3 && password.length <= 6))
+    res.status(401).json({error : "Passwords should be between 3 to 6 characters"});
   else if (user.username === username){
     res.status(401).json({ error: "Username already exists"});
   }  else {
@@ -99,14 +101,55 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/user-info", verifyToken, async (req, res) => {
-  const { username } = req.body;
+app.post("/protected-route", verifyToken, async (req, res) => {
   try {
-    const _user = await usercontract.wallets(username);
-    res.status(200).json({ user: _user });
+    const { username } = req.user; 
+    const user = await usercontract.wallets(username);
+    if (user) {
+      res.status(200).json({ user: user });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/redeem-tokens",async (req, res) => {
+  const {amount, name} = req.body;
+  try {
+    await usercontract.redeemTokens(amount, name);  
+    res.status(200).json({ message: "Tokens redeemed successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/fetch-tokens",async (req, res) => {
+  const {amount, name} = req.body;
+  try {
+    await usercontract.fetchTokens(amount, name);  
+    res.status(200).json({ message: "Tokens fetched successfully!" });
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/set-challenges", async (req, res) => {
+  const { username, challengeIndex, isActive } = req.body;
+
+  try {
+      const tx = await usercontract.setChallenges(username, challengeIndex, isActive);
+      await tx.wait();
+
+      res.status(200).json({ message: "Challenges set successfully" });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error setting challenges" });
   }
 });
 

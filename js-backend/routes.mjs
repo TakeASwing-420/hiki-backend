@@ -69,7 +69,6 @@ router.post("/balance", async (req, res) => {
     const user_balance = await usercontract.balanceOf(user.wallet);
     res.status(200).json({ _balance: user_balance.toString()});
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Error Encountered" });
   }
 });
