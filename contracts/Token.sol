@@ -12,7 +12,7 @@ contract Hikiko is ERC20Capped, Ownable, UserDB, ERC20Burnable{
     uint256 public limit = 2000000000 ;
     uint256 public initial_coinbase = 10000000 ; 
     
-    constructor() ERC20("Hikiko", "HK") ERC20Capped(limit) Ownable() {
+    constructor() ERC20("Relife", "R") ERC20Capped(limit) Ownable() {
         Manager = msg.sender;
         _mint(Manager, initial_coinbase);
     }
@@ -70,7 +70,6 @@ contract Hikiko is ERC20Capped, Ownable, UserDB, ERC20Burnable{
         wallets[name].username = name;
         wallets[name].wallet = wallet;
         wallets[name].password = password;
-        wallets[name].cid = "";
     }
 
     function Update_password(string calldata name, string memory data) public onlyOwner {
@@ -81,8 +80,7 @@ contract Hikiko is ERC20Capped, Ownable, UserDB, ERC20Burnable{
         wallets[name].cid = data;
     }
     
-    function setChallenges(string calldata name, uint256 challengeIndex, bool isActive) public onlyOwner {
-    require(challengeIndex < 6, "Invalid challenge index"); // Ensure challenge index is within bounds
+    function setChallenges(string calldata name, uint256 challengeIndex, bool isActive) public onlyOwner{
     wallets[name].challenges[challengeIndex] = isActive;
 }
 
