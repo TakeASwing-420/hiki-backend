@@ -25,7 +25,7 @@ router.post("/update-wallet", async (req, res) => {
     res.status(200).json({ message: "Wallet address updated successfully!" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error Encountered" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -56,7 +56,7 @@ router.delete("/delete-user", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error Encountered" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -69,8 +69,24 @@ router.post("/balance", async (req, res) => {
     const user_balance = await usercontract.balanceOf(user.wallet);
     res.status(200).json({ _balance: user_balance.toString()});
   } catch (error) {
-    res.status(500).json({ error: "Error Encountered" });
+    res.status(500).json({ error: error.message });
   }
 });
+
+router.post("/get-challenges", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    if (!username) {
+      throw new Error("Username is missing in the request body");
+    }
+    const user = await usercontract.wallets(username);
+    const challenge_list = [user.c1,user.c2,user.c3,user.c4,user.c5,user.c6];
+    res.status(200).json({ challenges: challenge_list });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 export default router;

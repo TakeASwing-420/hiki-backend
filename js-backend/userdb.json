@@ -587,6 +587,36 @@
 				"internalType": "string",
 				"name": "cid",
 				"type": "string"
+			},
+			{
+				"internalType": "bool",
+				"name": "c1",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "c2",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "c3",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "c4",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "c5",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "c6",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
