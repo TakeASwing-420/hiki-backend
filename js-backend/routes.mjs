@@ -1,7 +1,6 @@
-import { usercontract, provider, client } from './web3helper.mjs'; 
+import { usercontract} from './web3helper.mjs'; 
 import express from 'express';
 import { generateProof, verifyProof } from './verifier.mjs';
-import fs from 'fs';
 const router = express.Router();
 
 router.post("/update-password", async (req, res) => {
@@ -15,7 +14,7 @@ router.post("/update-password", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Error Encountered" });
   }
-});
+}); 
 
 router.post("/update-wallet", async (req, res) => {
   const { username, new_wallet } = req.body;
@@ -32,24 +31,14 @@ router.post("/update-wallet", async (req, res) => {
 
 
 router.delete("/delete-user", async (req, res) => {
-  const { username, cid } = req.body;
+  const { username} = req.body;
 
   try {
     const user = await usercontract.wallets(username);
 
     if (user.wallet !== "0x0000000000000000000000000000000000000000") {
-      await usercontract.delete_user(username);
-      
+      await usercontract.delete_user(username); 
       res.status(200).json({ message: "User deleted successfully!" });
-
-      try {
-        client.pin.rm(cid);
-        console.log(`Content with CID ${cid} successfully unpinned.`);
-      } catch (error) {
-        console.error(`Error while unpinning content with CID ${cid}:`, error);
-      }
-
-
     } else {
       res.status(401).json({ message: "User not found" });
     }
