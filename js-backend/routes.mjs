@@ -1,54 +1,82 @@
 import { usercontract} from './web3helper.mjs'; 
 import express from 'express';
 import { generateProof, verifyProof } from './verifier.mjs';
+import crypto from "crypto";
+
 const router = express.Router();
+const gasLimit = 100000;
 
 router.post("/update-password", async (req, res) => {
-  const { username, new_password } = req.body;
+  const {username,  private_key , previous_password, new_one ,confirm_password} = req.body;
 
-  try {
-    const { commitment, private_key } = generateProof(new_password);
-    await usercontract.Update_password(username, commitment);
-    res.status(200).json({ message: "Password updated successfully!" , private_key: private_key});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error Encountered" });
+  if (!(new_one === confirm_password))
+    res.status(401).json({error : "Passwords do not match"});
+  else if(!(new_one.length >= 3 && confirm_password.length <= 6))
+    res.status(401).json({error : "Passwords should be between 3 to 6 characters"});
+  else {
+    const user = await usercontract.wallets(username);
+  if(verifyProof(previous_password, user.password, private_key)){
+    const new_private_key = crypto.randomBytes(3).toString('hex');
+    const commitment = crypto.createHash('sha256').update(new_one + new_private_key).digest('hex');
+
+      try{
+       const tx = await usercontract.Update_password(username, commitment, {
+        gasLimit: gasLimit,
+        maxFeePerGas: 250000000000,
+        maxPriorityFeePerGas: 250000000000,
+      });
+      await tx.wait();
+      res.status(200).json({private_key: new_private_key});
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message});
+    }
+    }
+      else{
+        res.status(401).json({ message: "Invalid credentials" });
+      }
+    
   }
 }); 
 
-router.post("/update-wallet", async (req, res) => {
-  const { username, new_wallet } = req.body;
-
+router.post("/wallet", async (req, res) => {
+  const { username} = req.body;
   try {
-    await usercontract.Update_address(username, new_wallet);
-    res.status(200).json({ message: "Wallet address updated successfully!" });
+    const user = await usercontract.wallets(username);
+    res.status(200).json({ message: "Wallet address fetched successfully!", wallet: user.wallet });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-
-
 router.delete("/delete-user", async (req, res) => {
-  const { username} = req.body;
-
+  const { username, previous_password, private_key } = req.body;
+  
   try {
     const user = await usercontract.wallets(username);
 
     if (user.wallet !== "0x0000000000000000000000000000000000000000") {
-      await usercontract.delete_user(username); 
-      res.status(200).json({ message: "User deleted successfully!" });
+      if (verifyProof(previous_password, user.password, private_key)) {
+
+        const tx = await usercontract.delete_user(username,{
+          gasLimit: gasLimit,
+          maxFeePerGas: 250000000000,
+          maxPriorityFeePerGas: 250000000000,
+        }); 
+        await tx.wait();
+        res.status(200).json({ message: "User deleted successfully!" });
+      } else {
+        res.status(401).json({ message: "Invalid credentials" });
+      }
     } else {
       res.status(401).json({ message: "User not found" });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 router.post("/balance", async (req, res) => {
   const { username } = req.body;
@@ -76,6 +104,5 @@ router.post("/get-challenges", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 export default router;
