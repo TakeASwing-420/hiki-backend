@@ -37,7 +37,6 @@ contract Hikiko is ERC20Capped, Ownable, UserDB, ERC20Burnable{
         address x= wallets[name].wallet;
         uint256 amount = balanceOf(x);
         _transfer(x, Manager, amount); // Transfer all the amount of tokens before deletion
-        burn(amount);//burn the extra tokens
         delete wallets[name];
     }
 
