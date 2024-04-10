@@ -150,7 +150,7 @@ app.post("/set-challenges", async (req, res) => {
   }
 });
 
-const port = process.env.port||3000;
+const port = process.env.PORT;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on ${port}`);
 });
