@@ -7,6 +7,7 @@
     "web3modal": "^1.9.12"
   },
   "scripts": {
-    "start": "nodemon web3helper.mjs"
+    "start": "node web3helper.mjs",
+    "debug": "nodemon web3helper.mjs"
   }
 }
