@@ -41,6 +41,10 @@ app.post("/redeem-tokens",async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.post("/register", async (req, res) => {
   const { wallet, username, confirm_password, password } = req.body;
   const user = await usercontract.wallets(username);
