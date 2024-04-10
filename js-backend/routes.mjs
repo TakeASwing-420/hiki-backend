@@ -78,6 +78,30 @@ router.delete("/delete-user", async (req, res) => {
   }
 });
 
+router.post("/update-wallet", async (req, res) => {
+  const { username, wallet} = req.body;
+  
+  try {
+    const user = await usercontract.wallets(username);
+    if (user.wallet !== "0x0000000000000000000000000000000000000000") {
+
+        const tx = await usercontract.Update_address(username, wallet, {
+          gasLimit: gasLimit,
+          maxFeePerGas: 250000000000,
+          maxPriorityFeePerGas: 250000000000,
+        }); 
+        await tx.wait();
+        res.status(200).json({ message: "Wallet Updated successfully!" });
+      
+    } else {
+      res.status(401).json({ message: "Requested wallet can't be updated as it is not attached to the account" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post("/balance", async (req, res) => {
   const { username } = req.body;
 

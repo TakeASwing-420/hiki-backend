@@ -11,13 +11,13 @@ const app = express();
 app.use(express.json(),routes);
 export const contractaddress = process.env.CONTRACT_ADDRESS;//!use your deployed contract's address here
 
-export const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/q1jVC3tLd3_PoadQyMR08osZJ8SDKEqq");
+export const provider = new ethers.JsonRpcProvider("https://sepolia.optimism.io");
 const manager_wallet_private_key = privateKey;
 const manager = new ethers.Wallet(manager_wallet_private_key, provider);
 export const usercontract = new ethers.Contract(contractaddress, abi, manager);
 
 // Define gas limit based on the previous transaction's gas limit
-const gasLimit = 65000; // Adjusted gas limit
+const gasLimit = 50000; // Adjusted gas limit
 
 
 app.post("/update-cid", async (req, res) => {
@@ -116,6 +116,7 @@ app.post("/redeem-tokens",async (req, res) => {
 
 app.post("/fetch-tokens", async (req, res) => {
   const { amount, name } = req.body;
+  const user = await usercontract.wallets(name);
   try {
     // const _nonce = await manager.getNonce();
     const tx = await usercontract.fetchTokens(amount, name, {
