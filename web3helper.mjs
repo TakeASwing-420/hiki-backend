@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json(),routes);
 export const contractaddress = process.env.CONTRACT_ADDRESS;//!use your deployed contract's address here
 
-export const provider = new ethers.JsonRpcProvider("https://sepolia.optimism.io");
+export const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/q1jVC3tLd3_PoadQyMR08osZJ8SDKEqq");
 const manager_wallet_private_key = privateKey;
 const manager = new ethers.Wallet(manager_wallet_private_key, provider);
 export const usercontract = new ethers.Contract(contractaddress, abi, manager);
