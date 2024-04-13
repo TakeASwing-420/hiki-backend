@@ -17,7 +17,7 @@ const manager = new ethers.Wallet(manager_wallet_private_key, provider);
 export const usercontract = new ethers.Contract(contractaddress, abi, manager);
 
 // Define gas limit based on the previous transaction's gas limit
-const gasLimit = 50000; // Adjusted gas limit
+const gasLimit = 75000; // Adjusted gas limit
 
 
 app.post("/update-cid", async (req, res) => {
