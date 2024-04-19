@@ -4,22 +4,20 @@ os.Relife is an app targeted for socially challenged people which will help them
 
 ## Setup
 
-Before starting, please ensure you have set the following environment variables in a `.env` file:
+Before starting, please ensure you have set the following environment variables in the `.env` file:
 
 ```plaintext
-API_KEY=your_openrouteservice_api_key
-JWT=your_jwt_secret_key
+PRIVATE_KEY=your_private_key
+JWT_SECRET=your_jwt_secret_key
+CONTRARCT_ADDRESS=your deployed contract's address
 ```
-[Open Route Service](https://openrouteservice.org/)
-<br>
-If you want to run the server locally, change the `baseURL` in the `dbmshelper.dart` file.
-
+Also change the `RPCURL` in the `web3helper.mjs` file.
 ## Running the App
 
 After doing so, run the app by executing the following command in your terminal:
 
 ```bash
-flutter run
+npm start
 ```
 
 ## Contributing
