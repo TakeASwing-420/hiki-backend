@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import abi from "./userdb.json" assert { type: "json" };
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { generateProof, verifyProof, generateToken, verifyToken} from './verifier.mjs';
 import { config } from 'dotenv';
 import routes from './routes.mjs';
@@ -8,7 +9,17 @@ import routes from './routes.mjs';
 config();
 const privateKey = process.env.PRIVATE_KEY; //! use your own private key in a .env file
 const app = express();
-app.use(express.json(),routes);
+
+// set up rate limiter: maximum of 100 requests per 15 minutes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+// apply rate limiter to all requests
+app.use(limiter);
+
+app.use(express.json(), routes);
 export const contractaddress = process.env.CONTRACT_ADDRESS;//!use your deployed contract's address here
 
 export const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/q1jVC3tLd3_PoadQyMR08osZJ8SDKEqq");
