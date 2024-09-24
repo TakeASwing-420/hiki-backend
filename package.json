@@ -4,7 +4,8 @@
     "ethers": "^6.13.1",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
-    "web3modal": "^1.9.12"
+    "web3modal": "^1.9.12",
+    "express-rate-limit": "^7.4.0"
   },
   "scripts": {
     "start": "node web3helper.mjs",
