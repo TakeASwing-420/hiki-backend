@@ -58,7 +58,7 @@ router.post("/wallet", async (req, res) => {
   }
 });
 
-router.delete("/delete-user", async (req, res) => {
+router.delete("/delete-user", limiter, async (req, res) => {
   const { username, previous_password, private_key } = req.body;
   
   try {
