@@ -2,11 +2,19 @@ import { usercontract} from './web3helper.mjs';
 import express from 'express';
 import { generateProof, verifyProof } from './verifier.mjs';
 import crypto from "crypto";
+import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
+
+// Set up rate limiter: maximum of 100 requests per 15 minutes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes"
+});
 const gasLimit = 100000;
 
-router.post("/update-password", async (req, res) => {
+router.post("/update-password", limiter, async (req, res) => {
   const {username,  private_key , previous_password, new_one ,confirm_password} = req.body;
 
   if (!(new_one === confirm_password))
